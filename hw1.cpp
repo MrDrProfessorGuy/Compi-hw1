@@ -3,7 +3,7 @@
 
 using namespace std;
 
-
+string code_string = "";
 
 
 
@@ -22,6 +22,18 @@ int main(){
 }
 
 
+void appendString(char* token_name){
+    string tmp(yytext);
+    if (tmp == "\n"){
+        code_string.push_back(0xA);
+    }
+    else{
+        code_string.append(tmp);
+    }
+}
 
+void printString(char* token_name){
+    cout << code_string << endl;
+}
 
 
