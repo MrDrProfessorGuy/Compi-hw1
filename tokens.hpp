@@ -36,7 +36,8 @@ std::string tokentype_str[] = {"TEST", "VOID", "INT", "BYTE",
 */
 
 enum escapeType {Backslash=1, QuotationMark = 2, LF = 3, CR = 4, 
-                 TAB = 5, NUL = 6, HEXA = 7, InvalidHexa = 8, InvalidES = 9};
+                 TAB = 5, NUL = 6, HEXA = 7, InvalidHexa = 8, InvalidHexa_1chr = 9,
+                  InvalidHexa_0chr = 10, InvalidES = 11};
 
 
  #endif /* TOKENS_HPP_ */

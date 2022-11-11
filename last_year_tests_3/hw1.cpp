@@ -17,7 +17,7 @@ int main(){
 	token_value.resize(2048);
 	while ((token = yylex())) {
 	      //printf("%d %s %s\n", yylineno, token, yytext);
-		  cout << yylineno << " " << tokentype_str[token] << " " << token_value << endl;
+		  cout << yylineno << " " << tokentype_str[token] << " " << token_value.c_str() << endl;
 		  flush(cout);
 	}
 	

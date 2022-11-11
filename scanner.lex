@@ -26,6 +26,11 @@ void newString(char* token_name);
 void printString(char* token_name);
 void appendString(int token_name);
 void str_es(int escapeSequence_type);
+
+void debug(){
+    cout << "DEBUG:: yytext[0]= " << int(yytext[0]) << endl;
+}
+
 //int newToken(int token_type);
 
 //token_illegal   ("{printable}*\\[{printable}*-[n|r|t|0|x{hexa}{hexa}]]"|"{printable}*"{printable}+|"\\n"|"\\r")
@@ -40,8 +45,8 @@ digit   		([0-9])
 hexa            ([0-9A-Fa-f])
 letter  		([a-zA-Z])
 alphanumeric    ([a-zA-Z0-9])
-whitespace		([\t\n ])
-newLine         (\xA)
+whitespace		([\t\n\r ])
+newLine         ([\n\r])
 printable       ([ -~])
 printable_str   ([ -!#-\[\]-~]|\x09)
 good_escape_sequence    (\\\\|\\"|\\n|\\r|\\t|\\0|\\x[0-9][0-9])
@@ -61,7 +66,7 @@ token_if        (if)
 token_else      (else)
 token_while     (while)
 token_break     (break)
-token_continue  (contiue)
+token_continue  (continue)
 token_sc        (;)
 token_comma     (,)
 token_lparen    (\()
@@ -71,9 +76,9 @@ token_rbrace    (\})
 token_assign    (=)
 token_relop     (==|!=|<|>|<=|>=)
 token_binop     (\+|\-|\*|\/)
-rule            ([\n\t])
+rule            ([^\n\r])
 rule2           ([^{rule}])
-token_comment   (\/\/.*)
+token_comment   (\/\/{rule}*)
 token_id        ({letter}{alphanumeric}*)
 token_num       (0|[1-9]{digit}*)
 escape_1        (\\)
@@ -136,16 +141,21 @@ legal_escape    ({escape_1}|{escape_2}|{escape_3}|{escape_4}|{escape_5}|{escape_
 <STR_ES>{escape_6}   str_es(NUL);BEGIN(STR);
 
 <STR_ES>x               BEGIN(STR_HEX);
+<STR_ES>x\"             str_es(InvalidHexa_0chr);
 <STR_HEX>{escape_hexa}  str_es(HEXA);BEGIN(STR);
-<STR_HEX>.              str_es(InvalidHexa);
+<STR_HEX>.\"              str_es(InvalidHexa_1chr);
+<STR_HEX>..              str_es(InvalidHexa);
+<STR_HEX>.               str_es(InvalidHexa_1chr);
 
 <STR_ES>.          str_es(InvalidES);
 
 <STR>{newLine}   printf("Error unclosed string\n");exit(0);
 <STR>.   printf("Error %c\n", yytext);exit(0);
 
+<STR,STR_ES,STR_HEX><<EOF>>     printf("Error unclosed string\n");exit(0);
+
 {whitespace}                ;
-.		printf("Lex doesn't know what that is!\n");
+.		printf("Lex doesn't know what that is!\n");debug();
 
 %%
 
@@ -158,6 +168,7 @@ void showToken(char* token_name){
 void newString(char* token_name){
     token_value = "";
 }
+
 
 char to_hex(){
     string tmp(yytext);
@@ -190,10 +201,16 @@ void str_es(int escapeSequence_type){
             token_value.push_back(to_hex());
             break;
         case InvalidHexa:
-            printf("Error undefined escape sequence %c%c%c\n", yytext);
+            printf("Error undefined escape sequence x%c%c\n", yytext[0], yytext[1]);
+            exit(0);
+        case InvalidHexa_1chr:
+            printf("Error undefined escape sequence x%c\n", yytext[0]);
+            exit(0);
+        case InvalidHexa_0chr:
+            printf("Error undefined escape sequence x\n");
             exit(0);
         default:
-            printf("Error undefined escape sequence %c\n", yytext);
+            printf("Error undefined escape sequence %c\n", yytext[0]);
             exit(0);
     };
     //cout << "str_es[" << token_value.size() << "]:: " << token_value.c_str() << endl;
