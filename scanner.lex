@@ -43,7 +43,7 @@ alphanumeric    ([a-zA-Z0-9])
 whitespace		([\t\n ])
 newLine         (\xA)
 printable       ([ -~])
-printable_str   ([ -!#-\[\]-~]|\x09|\x0D)
+printable_str   ([ -!#-\[\]-~]|\x09)
 good_escape_sequence    (\\\\|\\"|\\n|\\r|\\t|\\0|\\x[0-9][0-9])
 
 token_void      (void)
@@ -71,7 +71,8 @@ token_rbrace    (\})
 token_assign    (=)
 token_relop     (==|!=|<|>|<=|>=)
 token_binop     (\+|\-|\*|\/)
-
+rule            ([\n\t])
+rule2           ([^{rule}])
 token_comment   (\/\/.*)
 token_id        ({letter}{alphanumeric}*)
 token_num       (0|[1-9]{digit}*)
@@ -82,12 +83,13 @@ escape_4        (r)
 escape_5        (t)
 escape_6        (0)
 escape_7        (x{hexa}{hexa})
+escape_hexa     ([0-7]{hexa})
 escape_bad_hexa        (x[^{hexa}]{hexa}|x[^{hexa}][^{hexa}]|x{hexa}[^{hexa}])
-escape_hexa        (x..)
 legal_escape    ({escape_1}|{escape_2}|{escape_3}|{escape_4}|{escape_5}|{escape_6}|{escape_7})
 
 %x STR
 %x STR_ES
+%x STR_HEX
 
 
 %%
@@ -121,12 +123,10 @@ legal_escape    ({escape_1}|{escape_2}|{escape_3}|{escape_4}|{escape_5}|{escape_
 {token_id}        newToken(ID);
 {token_num}       newToken(NUM);
 
-
-\"\\n\"|\"\\r\"     printf("ERROR");exit(0);
 \"                BEGIN(STR);newString("");
-<STR>\"      BEGIN(INITIAL);return (STRING);
+<STR>\"           BEGIN(INITIAL);return (STRING);
 <STR>{printable_str}   appendString(0);
-<STR>\\      BEGIN(STR_ES);
+<STR>\\           BEGIN(STR_ES);
 
 <STR_ES>{escape_1}   str_es(Backslash);BEGIN(STR);
 <STR_ES>{escape_2}   str_es(QuotationMark);BEGIN(STR);
@@ -134,8 +134,11 @@ legal_escape    ({escape_1}|{escape_2}|{escape_3}|{escape_4}|{escape_5}|{escape_
 <STR_ES>{escape_4}   str_es(CR);BEGIN(STR);
 <STR_ES>{escape_5}   str_es(TAB);BEGIN(STR);
 <STR_ES>{escape_6}   str_es(NUL);BEGIN(STR);
-<STR_ES>{escape_7}   str_es(HEXA);BEGIN(STR);
-<STR_ES>{escape_bad_hexa}   str_es(InvalidHexa);
+
+<STR_ES>x               BEGIN(STR_HEX);
+<STR_HEX>{escape_hexa}  str_es(HEXA);BEGIN(STR);
+<STR_HEX>.              str_es(InvalidHexa);
+
 <STR_ES>.          str_es(InvalidES);
 
 <STR>{newLine}   printf("Error unclosed string\n");exit(0);
@@ -157,7 +160,8 @@ void newString(char* token_name){
 }
 
 char to_hex(){
-    string tmp(yytext+1);
+    string tmp(yytext);
+    //cout << "to_hex:: yytext: " << yytext << " tmp:" << tmp << " to: " << stoi(tmp, 0, 16) << " is: " << char(stoi(tmp, 0, 16)) << endl; 
     return stoi(tmp, 0, 16);
 }
 
@@ -192,11 +196,12 @@ void str_es(int escapeSequence_type){
             printf("Error undefined escape sequence %c\n", yytext);
             exit(0);
     };
+    //cout << "str_es[" << token_value.size() << "]:: " << token_value.c_str() << endl;
 }
 
 void appendString(int token_name){
     string tmp(yytext);
-    token_value.append(yytext);
+    token_value.append(tmp);
 }
 
 

@@ -13,6 +13,8 @@ using namespace std;
 
 int main(){
 	int token;
+	//cout << "max size = " << token_value.max_size() << endl;
+	token_value.resize(2048);
 	while ((token = yylex())) {
 	      //printf("%d %s %s\n", yylineno, token, yytext);
 		  cout << yylineno << " " << tokentype_str[token] << " " << token_value << endl;

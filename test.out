@@ -1,0 +1,36 @@
+1 COMMENT //
+2 RETURN return
+3 BINOP +
+3 STRING y0AX~bD: P
+@"[9C4bFqm/\~q:\"3	ui/4C
+5e+h_L-el
+'[{\<YH}c\ &
+c1c
+3 COMMENT //
+5 ID npm3ib085Pf9m
+5 BINOP -
+6 ID continue
+6 RELOP >=
+6 BINOP -
+6 BOOL bool
+7 COMMENT //
+8 COMMENT //
+9 NUM 78
+10 STRING  	nv
+U6l"%DS`"#\P\T	\d`0	
+10 ID do0FMH88NIaRxMKITcLQzKxVr32wOInDq9E5kU2DMXE4
+11 ID RLhSq9C1752b2N3pY8ewri213cn70457m9W
+12 BINOP -
+12 RELOP >
+13 RELOP !=
+14 COMMENT //
+16 BINOP +
+17 BINOP +
+18 ID b5934jSK6kFbKnl29uGlfJ5n6ZlPvuGbvTWAqTFLYDtH
+18 OR or
+18 BINOP +
+19 NUM 845
+19 STRING f#iq(;F
+20 ID sRKfL7Vma5KKk82T5nb
+21 RELOP <
+22 COMMENT //
